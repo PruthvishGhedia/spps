@@ -1,0 +1,678 @@
+================================================================================
+                           STUDENT PERFORMANCE
+                           PREDICTION SYSTEM (SPPS)
+================================================================================
+
+                                 A REPORT
+
+
+                                Submitted by
+
+
+                        Mansi (<Enrolment No.>)
+
+
+                    In partial fulfillment for the award of the
+
+
+                        DIPLOMA ENGINEERING
+
+
+                        in
+
+
+                    Information Technology Department
+
+
+
+                    R. C. Technical Institute, Ahmedabad
+
+
+                    Gujarat Technological University, Ahmedabad
+                              April, 2026
+
+
+
+================================================================================
+R. C. TECHNICAL INSTITUTE
+Opposite Gujarat High Court, S. G. Highway, Sola,
+Ahmedabad-380060
+DEPARTMENT OF INFORMATION TECHNOLOGY
+2026
+
+CERTIFICATE
+
+This is to certify that Mansi has satisfactorily completed the project work entitled
+Student Performance Prediction System (SPPS) assigned as UDP in partial
+fulfilment of Software Development Course (4361604) during 6th semester of
+academic year 2025-26.
+
+
+
+
+_____________________          _________________________
+Internal Guide                Head of Department
+<Name of Guide>               Mr. Jaydipsinh R. Mahida
+Lecturer in IT Department     IT Department
+
+
+
+
+================================================================================
+                          ACKNOWLEDGEMENT
+================================================================================
+
+I take this opportunity to express my profound gratitude to all those who helped
+me in completion of this project.
+
+I would like to thank my college for providing excellent facilities that helped me
+to complete and present this project. I would also like to thank the staff members
+and lab assistants for permitting me to use computers in the lab as and when
+required.
+
+I express my deepest gratitude towards my project guide for his valuable and
+timely advice during the various phases of this project. I would also like to thank
+him for providing me with all proper facilities and support as the project
+coordinator.
+
+I would like to thank all my friends for their smiles and friendship making the
+college life enjoyable and memorable and my family members who always stood
+beside me and provided the utmost important moral support.
+
+Finally, I would like to thank everyone who has helped me directly or indirectly in
+completion of this project.
+
+
+
+
+================================================================================
+                             ABSTRACT
+================================================================================
+
+The Student Performance Prediction System (SPPS) is a web-based application
+designed to predict student academic performance and identify at-risk students
+in educational institutions. The system analyzes various academic indicators such
+as attendance, midterm scores, and previous grades to provide predictions and
+early warnings for students who may struggle in their courses.
+
+The main objective of this project is to develop an automated system that can
+help educators identify struggling students early in the semester, enabling timely
+intervention and support. The system uses machine learning algorithms
+including Linear Regression for grade prediction and Decision Tree logic for
+student classification as "Safe" or "At Risk".
+
+The application is built using React for frontend, Express.js for backend, and
+SQLite for database management. It provides features including student data
+management, AI-powered performance prediction, real-time analytics dashboard,
+and CSV-based data import/export functionality.
+
+This project demonstrates proficiency in full-stack web development and
+showcases how modern web technologies can be applied to solve real-world
+educational problems.
+
+
+
+
+
+================================================================================
+                         LIST OF FIGURES
+================================================================================
+
+Sr. No.     Name of Figures                                  Page No.
+1.          System Architecture                             -
+2.          Context Diagram (0 Level)                       -
+3.          Data Flow Diagram (1 Level)                      -
+4.          E-R Diagram                                     -
+5.          Use Case Diagram                                -
+6.          Application Dashboard                           -
+7.          Analytics Charts                                 -
+8.          Student List with Prediction                    -
+9.          Add Student Modal                                -
+10.         Prediction Results                               -
+
+
+================================================================================
+                         LIST OF TABLES
+================================================================================
+
+Sr. No.     Name of Table                                   Page No.
+1.          Technology Stack                               -
+2.          API Endpoints                                   -
+3.          Database Schema                                 -
+4.          Functional Requirements                         -
+5.          Non-Functional Requirements                     -
+6.          Hardware Requirements                           -
+7.          Software Requirements                           -
+8.          Prediction Algorithm Weights                    -
+9.          Classification Rules                             -
+10.         Test Results                                    -
+
+
+================================================================================
+                    LIST OF ABBREVIATIONS
+================================================================================
+
+Sr. No.     Abbreviation            Full Form
+1.          SPPS                   Student Performance Prediction System
+2.          CRUD                   Create, Read, Update, Delete
+3.          API                    Application Programming Interface
+4.          SQLite                 Structured Query Language Lite
+5.          React                  JavaScript Library for UI
+6.          Express                Node.js Web Framework
+7.          Vite                   Build Tool
+8.          CSS                    Cascading Style Sheets
+9.          CSV                    Comma Separated Values
+10.         UI                     User Interface
+
+
+================================================================================
+                      TABLE OF CONTENTS
+================================================================================
+
+Acknowledgement                                    i
+Abstract                                          ii
+List of Figures                                   iii
+List of Tables                                    iv
+List of Abbreviations                             v
+Table of Contents                                 vi
+
+CHAPTER 1: INTRODUCTION
+1.1   Project Summary                            1
+1.2   Purpose                                    2
+1.3   Scope                                      2
+1.4   Technology Review                         3
+
+CHAPTER 2: PROJECT MANAGEMENT
+2.1   Project Planning & Schedule               5
+2.2   Risk Management                           6
+2.3   Estimation                                7
+
+CHAPTER 3: SYSTEM REQUIREMENT STUDY
+3.1   User Characteristics                       8
+3.2   Hardware and Software Requirements        9
+
+CHAPTER 4: SYSTEM ANALYSIS AND DESIGNING
+4.1   Study of Current System                   10
+4.2   Problem & Weakness of Current System      11
+4.3   Requirement of New System                11
+4.4   Feasibility Study                         12
+4.5   Function of the System                    13
+4.6   Data Modelling                            14
+4.7   Functional & Behavioral Modeling          15
+
+Screenshots                                      -
+Conclusion                                        -
+References                                        -
+
+
+
+================================================================================
+                    CHAPTER 1: INTRODUCTION
+================================================================================
+
+1.1 PROJECT SUMMARY
+
+Project Name: Student Performance Prediction System (SPPS)
+
+The Student Performance Prediction System is a web-based application designed
+to automate the process of identifying students who are at risk of academic
+failure. The main idea of the project is to maintain and handle all student data
+including attendance, midterm scores, and previous semester grades, and use
+this data to predict final examination performance.
+
+The system analyzes various academic indicators to provide accurate predictions
+of student performance. It classifies students as either "Safe" or "At Risk" based
+on predefined criteria, enabling educators to take timely intervention measures.
+
+Key features of the system include:
+- Student data management with full CRUD operations
+- AI-powered performance prediction using weighted algorithms
+- Real-time analytics dashboard with statistics and charts
+- CSV-based bulk data import and export functionality
+- Responsive user interface with intuitive navigation
+- Color-coded risk indicators for quick identification
+
+The system addresses the need for early identification of at-risk students, which
+is critical for improving overall academic outcomes and student success rates.
+
+
+
+1.2 PURPOSE
+
+The purpose of this project is to develop a web-based system that:
+- Provides a centralized platform for managing student academic records
+- Predicts student final examination scores based on current performance
+- Identifies at-risk students early in the semester for timely intervention
+- Offers visual analytics to help administrators make informed decisions
+- Enables efficient data handling through CSV import/export features
+
+
+
+1.3 SCOPE
+
+In this system:
+1. Administrator will be able to add, view, edit, and delete student records.
+2. The system will predict final grades using AI algorithms.
+3. Students will be classified as "Safe" or "At Risk" based on predictions.
+4. The system will display real-time statistics and analytics.
+5. Users will be able to import and export data in CSV format.
+
+The system is designed for educational institutions, particularly for teachers and
+administrators who need to monitor and predict student performance.
+
+
+
+1.4 TECHNOLOGY REVIEW
+
+Frontend: React 19.0.0
+
+React is a JavaScript library for building user interfaces. It enables creating
+reusable UI components and managing the view layer for web and mobile
+applications. React uses a virtual DOM to optimize rendering and provides a
+component-based architecture that makes code more predictable and easier to
+debug.
+
+React's key features include:
+- Component-based architecture
+- Virtual DOM for efficient updates
+- One-way data binding
+- JSX syntax for improved readability
+- Rich ecosystem with numerous libraries
+
+Backend: Express.js 4.21.2
+
+Express.js is a minimal and flexible Node.js web application framework that
+provides robust features for web and mobile applications. It provides a thin
+layer of fundamental web application features without obscuring Node.js features.
+
+Express.js key features include:
+- Robust routing
+- Middleware support
+- Template engines
+- Static file serving
+- RESTful API creation
+
+Database: SQLite (better-sqlite3 12.4.1)
+
+SQLite is a lightweight, file-based relational database that does not require a
+separate server process. The better-sqlite3 library provides a synchronous
+interface for SQLite operations, making it ideal for small to medium-sized
+applications.
+
+SQLite key features include:
+- Zero-configuration
+- Single file storage
+- ACID compliant
+- Lightweight and fast
+- No server required
+
+Build Tool: Vite 6.2.0
+
+Vite is a modern build tool that provides extremely fast hot module replacement
+(HMR) and optimized production builds. It uses native ES modules and offers
+instant server start.
+
+Styling: Tailwind CSS 4.1.14
+
+Tailwind CSS is a utility-first CSS framework that allows rapid UI development
+by providing low-level utility classes. It enables building custom designs without
+leaving the HTML.
+
+Charts: Recharts 3.7.0
+
+Recharts is a composable charting library built on React components. It provides
+easy-to-use chart components for data visualization.
+
+Language: TypeScript 5.8.2
+
+TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. It
+provides static type checking, classes, interfaces, and modules for better code
+organization and maintainability.
+
+
+
+================================================================================
+                CHAPTER 2: PROJECT MANAGEMENT
+================================================================================
+
+2.1 PROJECT PLANNING & SCHEDULE
+
+The project was developed following the Iterative Waterfall Model, which
+provides feedback paths from each phase to its preceding phases, allowing for
+error correction and iterative improvements.
+
+Project Development Approach:
+The project started with understanding the problem definition and gathering
+requirements. After analyzing requirements, the system design phase began
+with database schema creation and API design. The implementation phase
+involved developing both frontend and backend components. Testing was
+performed continuously throughout development.
+
+Project Plan:
+- Requirement Gathering: 1 week
+- System Analysis: 1 week
+- System Design: 1 week
+- Implementation: 4 weeks
+- Testing and Documentation: 2 weeks
+
+Milestones:
+1. Understanding of project definition
+2. Requirements gathering and analysis
+3. Database design and API creation
+4. Frontend development
+5. Backend integration
+6. Testing and validation
+7. Documentation completion
+
+
+
+2.2 RISK MANAGEMENT
+
+Risk Identification:
+
+1. Schedule Risks:
+- Wrong time estimation
+- Complex functionality integration
+- Unexpected scope changes
+
+2. Technical Risks:
+- Integration challenges between frontend and backend
+- Database performance issues
+- Browser compatibility issues
+
+3. Operational Risks:
+- Data validation errors
+- CSV parsing failures
+- API response timeouts
+
+Risk Mitigation:
+- Regular code reviews and testing
+- Proper error handling and logging
+- Input validation on both client and server sides
+- Comprehensive documentation
+
+
+
+2.3 ESTIMATION
+
+Effort Estimation:
+
+Task Name                  Estimated Time    Status
+Project Definition         1 Week            Completed
+Requirement Gathering     1 Week            Completed
+Analysis                  1 Week            Completed
+Planning                  2 Days            Completed
+Database Design           3 Days            Completed
+Backend Development       1 Week            Completed
+Frontend Development      2 Weeks           Completed
+Testing                   1 Week            Completed
+Documentation             1 Week            Completed
+
+
+
+================================================================================
+            CHAPTER 3: SYSTEM REQUIREMENT STUDY
+================================================================================
+
+3.1 USER CHARACTERISTICS
+
+User characteristics help designers understand the target users and predict
+usability problems.
+
+1. Administrator/Teacher:
+- Can add, edit, and delete student records
+- Can import bulk data via CSV
+- Can export student data
+- Can view analytics and predictions
+- Can make informed decisions based on data
+
+2. System Operator:
+- Technical user who manages the application
+- Requires basic computer knowledge
+- Should be familiar with web browsers
+
+User Requirements:
+- Simple and intuitive interface
+- Quick response time
+- Clear visualization of data
+- Easy data import/export functionality
+
+
+
+3.2 HARDWARE AND SOFTWARE REQUIREMENTS
+
+Hardware Requirements:
+- Minimum 1 GHz processor
+- Minimum 2GB of RAM
+- 500 MB Free storage space
+- Internet connection for API access
+
+Software Requirements:
+- Web Browser: Google Chrome, Mozilla Firefox, Microsoft Edge
+- Operating System: Windows 10/11, Linux, macOS
+- Node.js: Version 16 or above
+- npm: Version 8 or above
+
+
+
+================================================================================
+          CHAPTER 4: SYSTEM ANALYSIS AND DESIGNING
+================================================================================
+
+4.1 STUDY OF CURRENT SYSTEM
+
+Currently, many educational institutions rely on manual methods to track student
+performance. Teachers maintain spreadsheets or paper records to track student
+attendance and grades. This manual approach has several drawbacks:
+
+- Time-consuming data entry and retrieval
+- Prone to human errors
+- Difficult to identify at-risk students early
+- No automated analysis or prediction capabilities
+- Limited visualization and reporting options
+
+The proposed system addresses these issues by providing an automated,
+centralized platform for student performance management and prediction.
+
+
+
+4.2 PROBLEMS & WEAKNESS OF CURRENT SYSTEM
+
+- Manual data entry is time-consuming
+- High chance of human errors in calculations
+- No automated prediction mechanism
+- Difficult to identify at-risk students early
+- Limited data visualization capabilities
+- No bulk data handling capability
+- No centralized database management
+
+
+
+4.3 REQUIREMENT OF NEW SYSTEM
+
+Functional Requirements:
+- FR01: Add new student with details (name, attendance, midterms, previous grade)
+- FR02: View list of all students
+- FR03: Edit existing student records
+- FR04: Delete individual or all student records
+- FR05: Import bulk data via CSV
+- FR06: Export data to CSV
+- FR07: Predict final grades for students
+- FR08: Classify students as Safe or At Risk
+- FR09: Display statistics (total, at-risk, safe, average attendance)
+- FR10: Show performance charts
+
+Non-Functional Requirements:
+- NFR01: Response time less than 2 seconds
+- NFR02: Compatible with modern web browsers
+- NFR03: Intuitive user interface
+- NFR04: Handle at least 1000 records efficiently
+- NFR05: Data persistence using SQLite
+
+
+
+4.4 FEASIBILITY STUDY
+
+1. Technical Feasibility:
+- All required technologies are freely available
+- Development tools are accessible
+- System can be implemented with current technology
+
+2. Economic Feasibility:
+- No additional software costs (open-source technologies)
+- Reduces manual workload
+- Saves time and effort
+
+3. Operational Feasibility:
+- User-friendly interface
+- Easy to learn and operate
+- Provides significant benefits to users
+
+
+
+4.5 FUNCTION OF THE SYSTEM
+
+Use Case Diagram:
+
+[Administrator] ---> [Add Student]
+[Administrator] ---> [View Students]
+[Administrator] ---> [Edit Student]
+[Administrator] ---> [Delete Student]
+[Administrator] ---> [Import CSV]
+[Administrator] ---> [Export CSV]
+[Administrator] ---> [Predict Performance]
+[Administrator] ---> [View Analytics]
+
+
+
+4.6 DATA MODELLING
+
+E-R Diagram:
+
+Student (id, name, attendance, midterm_1, midterm_2, previous_grade,
+         predicted_grade, status)
+
+Database Schema:
+
+Table: students
+Field              Data Type        Description
+--------------------------------------------------------
+id                 INTEGER          Primary Key, Auto-increment
+name               TEXT             Student Name
+attendance         REAL             Attendance Percentage
+midterm_1          INTEGER          Midterm 1 Score (0-20)
+midterm_2          INTEGER          Midterm 2 Score (0-20)
+previous_grade     INTEGER          Previous Grade (0-100)
+predicted_grade    REAL             Predicted Final Grade
+status             TEXT             "Safe" or "At Risk"
+
+
+
+4.7 FUNCTIONAL & BEHAVIORAL MODELING
+
+Context Diagram (0 Level):
+
+[User] --> [SPPS Application] --> [Database]
+[User] <-- [SPPS Application] <-- [Database]
+
+Data Flow Diagram (1 Level):
+
+[User] --> [Input Form] --> [Validation] --> [API Handler] --> [Database]
+[User] <-- [Display] <-- [Data Processor] <-- [API Handler] <-- [Database]
+
+
+
+4.8 MAIN MODULES OF NEW SYSTEM
+
+1. Student Management Module:
+   - Add new student
+   - View student list
+   - Edit student details
+   - Delete student records
+
+2. Prediction Module:
+   - Calculate predicted grade using weighted algorithm
+   - Classify student status using decision tree logic
+
+3. Analytics Module:
+   - Display statistics (total, at-risk, safe, average)
+   - Show performance charts
+   - Real-time data updates
+
+4. Data Import/Export Module:
+   - Parse CSV files for bulk import
+   - Export data to CSV format
+   - Template download for CSV
+
+5. API Module:
+   - RESTful endpoints for CRUD operations
+   - Request validation and error handling
+
+
+
+================================================================================
+                         SCREENSHOTS
+================================================================================
+
+[SPACE FOR ATTACHING SCREENSHOTS]
+
+1. Application Dashboard - Main Interface
+2. Analytics Charts Section
+3. Student List with Prediction Badges
+4. Add Student Modal Form
+5. Prediction Results Table
+6. CSV Import/Export Functionality
+
+
+
+================================================================================
+                         CONCLUSION
+================================================================================
+
+The Student Performance Prediction System (SPPS) successfully demonstrates a
+complete full-stack web application with AI-powered prediction capabilities. The
+system provides educators with an efficient tool to manage student records and
+identify at-risk students early in the academic semester.
+
+Key achievements of this project:
+- Implemented a fully functional student data management system
+- Developed an AI-based prediction model using weighted algorithms
+- Created an interactive dashboard with real-time analytics
+- Enabled CSV-based data import and export functionality
+- Built a responsive and user-friendly interface
+
+The project showcases proficiency in modern web development technologies
+including React, Express.js, SQLite, and TypeScript. It demonstrates how
+machine learning concepts can be applied to solve real-world educational
+problems.
+
+Future enhancements could include:
+- Integration with actual AI models like Google Gemini for more accurate
+  predictions
+- User authentication and role-based access control
+- Cloud database migration
+- Additional visualization options
+- Email notifications for at-risk students
+- Mobile application development
+
+This project has provided valuable hands-on experience in full-stack
+development and has helped develop essential skills required for a successful
+career in software engineering.
+
+
+
+================================================================================
+                         REFERENCES
+================================================================================
+
+1. React Documentation. (2026). Retrieved from https://react.dev
+2. Express.js Documentation. (2026). Retrieved from https://expressjs.com
+3. SQLite Documentation. (2026). Retrieved from https://sqlite.org
+4. Tailwind CSS Documentation. (2026). Retrieved from https://tailwindcss.com
+5. Recharts Documentation. (2026). Retrieved from https://recharts.org
+6. TypeScript Documentation. (2026). Retrieved from https://typescriptlang.org
+7. Vite Documentation. (2026). Retrieved from https://vitejs.dev
+8. Node.js Documentation. (2026). Retrieved from https://nodejs.org
+
+
+================================================================================

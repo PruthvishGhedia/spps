@@ -1,0 +1,11 @@
+name = "spps"
+compatibility_date = "2024-01-01"
+main = "src/worker.ts"
+
+[env.production]
+vars = { API_URL = "https://spps.your-subdomain.workers.dev" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spps-db"
+database_id = "your-d1-database-id"
