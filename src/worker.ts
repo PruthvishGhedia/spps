@@ -12,14 +12,10 @@ const app = new Hono<{ Bindings: Bindings }>();
 // CORS
 app.use('/*', cors());
 
-// Static files from _public
-app.get('/*', serveStatic({ root: './_public' }));
-
 // GET all students
 app.get('/api/students', async (c) => {
   const db = c.env.DB;
   try {
-    // Create table if not exists
     await db.prepare(`
       CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +41,6 @@ app.get('/api/students', async (c) => {
 // POST single student
 app.post('/api/students', async (c) => {
   const db = c.env.DB;
-  
   try {
     const { name, attendance, midterm_1, midterm_2, previous_grade } = await c.req.json();
     
@@ -68,7 +63,6 @@ app.post('/api/students', async (c) => {
 // POST - Bulk insert
 app.post('/api/students/bulk', async (c) => {
   const db = c.env.DB;
-  
   try {
     const students = await c.req.json();
     
@@ -157,5 +151,8 @@ app.delete('/api/students/:id', async (c) => {
     return c.json({ error: String(e) }, 500);
   }
 });
+
+// Static files - MUST be last
+app.get('/*', serveStatic({ root: './_public' }));
 
 export default app;
