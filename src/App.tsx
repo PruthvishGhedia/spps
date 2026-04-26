@@ -56,27 +56,11 @@ export default function App() {
 
   useEffect(() => {
     fetchStudents();
-    checkApiKey();
-
     // Set up polling interval for real-time updates
     const interval = setInterval(fetchStudents, 5000); // Fetch every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
-
-  const checkApiKey = async () => {
-    if (window.aistudio?.hasSelectedApiKey) {
-      const selected = await window.aistudio.hasSelectedApiKey();
-      setHasApiKey(selected);
-    }
-  };
-
-  const handleOpenKeySelector = async () => {
-    if (window.aistudio?.openSelectKey) {
-      await window.aistudio.openSelectKey();
-      setHasApiKey(true);
-    }
-  };
 
   const fetchStudents = async () => {
     try {
