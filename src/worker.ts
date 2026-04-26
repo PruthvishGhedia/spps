@@ -12,14 +12,8 @@ const app = new Hono<{ Bindings: Bindings }>();
 // CORS
 app.use('/*', cors());
 
-// Fallback for assets
-app.get('/assets/*', serveStatic({ root: './dist' }));
-
-// Serve index.html for root
-app.get('/', serveStatic({ root: './dist', index: 'index.html' }));
-
-// Serve static assets
-app.get('/*', serveStatic({ root: './dist' }));
+// Static files from _public
+app.get('/*', serveStatic({ root: './_public' }));
 
 // GET all students
 app.get('/api/students', async (c) => {
