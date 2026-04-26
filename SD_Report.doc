@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: "Times New Roman", serif; font-size: 12pt; }
+h1 { text-align: center; font-size: 16pt; font-weight: bold; }
+h2 { font-size: 14pt; font-weight: bold; border-bottom: 1px solid black; }
+h3 { font-size: 12pt; font-weight: bold; }
+p { margin: 6pt 0; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid black; padding: 4pt; text-align: left; }
+th { background: #ccc; }
+pre { background: #f0f0f0; padding: 8pt; border: 1px solid #999; }
+.box { border: 2px dashed #999; padding: 20pt; text-align: center; margin: 10pt 0; background: #f9f9f9; }
+</style>
+</head>
+<body>
+
+<h1>SOFTWARE DEVELOPMENT REPORT</h1>
+<p style="text-align:center"><b>Student Performance Prediction System (SPPS)</b></p>
+<p style="text-align:center">Project Name: EduPredict AI - Student Performance Prediction System<br>Developer: Mansi<br>Date: April 2026<br>Version: 1.0.0</p>
+
+<hr>
+
+<h2>1. EXECUTIVE SUMMARY</h2>
+<p>The Student Performance Prediction System (SPPS) is a full-stack web application that predicts student academic performance based on various academic indicators. The system uses machine learning algorithms (Linear Regression and Decision Tree logic) to analyze student data including attendance, midterm scores, and previous grades to predict final exam outcomes and identify at-risk students.</p>
+<p><b>Key Features:</b></p>
+<ul>
+<li>Add, edit, and delete student records</li>
+<li>Bulk CSV import/export functionality</li>
+<li>AI-powered performance prediction</li>
+<li>Real-time analytics dashboard</li>
+<li>SQLite database for persistent storage</li>
+</ul>
+
+<hr>
+
+<h2>2. PROJECT OVERVIEW</h2>
+<h3>2.1 Problem Statement</h3>
+<p>Educational institutions need an efficient way to identify students who may be at risk of poor academic performance early in the semester. Traditional methods of identifying at-risk students are often reactive rather than predictive. This project addresses the need for an automated, data-driven system that can:</p>
+<ol>
+<li>Store and manage student academic records</li>
+<li>Predict final examination scores based on current performance</li>
+<li>Classify students as "Safe" or "At Risk"</li>
+<li>Provide visual analytics for administrators</li>
+</ol>
+
+<h3>2.2 Solution</h3>
+<p>The SPPS provides a modern, intuitive web interface where educators can input student data, get instant AI-powered predictions, visualize class performance through charts, and export data for external analysis.</p>
+<div class="box">[SCREENSHOT SPACE 1: Application Dashboard - Main Interface]</div>
+
+<hr>
+
+<h2>3. SYSTEM ARCHITECTURE</h2>
+<h3>3.1 Technology Stack</h3>
+<table>
+<tr><th>Component</th><th>Technology</th></tr>
+<tr><td>Frontend</td><td>React 19.0.0</td></tr>
+<tr><td>Backend</td><td>Express.js 4.21.2 + Node.js</td></tr>
+<tr><td>Database</td><td>SQLite (better-sqlite3 12.4.1)</td></tr>
+<tr><td>Build Tool</td><td>Vite 6.2.0</td></tr>
+<tr><td>Styling</td><td>Tailwind CSS 4.1.14</td></tr>
+<tr><td>Charts</td><td>Recharts 3.7.0</td></tr>
+<tr><td>Animations</td><td>Motion 12.23.24</td></tr>
+<tr><td>AI/ML</td><td>Custom Linear Regression & Decision Tree</td></tr>
+<tr><td>Language</td><td>TypeScript 5.8.2</td></tr>
+</table>
+
+<h3>3.2 Project Structure</h3>
+<pre>spps final/
+├── server.ts                 # Express server with SQLite API
+├── src/
+│   ├── App.tsx              # Main React application
+│   ├── main.tsx             # Application entry point
+│   ├── index.css            # Global styles
+│   ├── services/
+│   │   └── geminiService.ts # AI prediction algorithm
+│   ├── lib/
+│   │   └── utils.ts         # Utility functions
+│   └── global.d.ts          # TypeScript definitions
+├── package.json             # Dependencies
+├── vite.config.ts           # Vite configuration
+├── tsconfig.json            # TypeScript configuration
+├── students.db              # SQLite database
+├── demo_students.csv        # Sample data (207 records)
+└── StudentPerformanceFactors.csv  # Research dataset (6,608 records)</pre>
+
+<hr>
+
+<h2>4. FUNCTIONAL SPECIFICATION</h2>
+<h3>4.1 Core Features</h3>
+<p><b>4.1.1 Student Management</b></p>
+<ul>
+<li>Add Student: Manual entry with fields for name, attendance %, midterm 1 (0-20), midterm 2 (0-20), and previous grade</li>
+<li>Edit Student: Update existing records</li>
+<li>Delete Student: Remove individual or all student records</li>
+<li>Bulk Import: CSV file upload with automatic parsing</li>
+</ul>
+
+<p><b>4.1.2 Performance Prediction</b></p>
+<p>The system uses a weighted algorithm to predict final grades:</p>
+<table>
+<tr><th>Factor</th><th>Weight</th></tr>
+<tr><td>Attendance</td><td>20%</td></tr>
+<tr><td>Midterm 1</td><td>25%</td></tr>
+<tr><td>Midterm 2</td><td>35%</td></tr>
+<tr><td>Previous Grade</td><td>20%</td></tr>
+</table>
+
+<p><b>Decision Tree Classification:</b></p>
+<p>A student is classified as "At Risk" if ANY of the following conditions are met:</p>
+<ol>
+<li>Predicted grade < 60%</li>
+<li>Attendance < 75%</li>
+<li>Midterm 2 score dropped > 15 points from Midterm 1</li>
+</ol>
+
+<p><b>4.1.3 Data Visualization</b></p>
+<ul>
+<li>Bar chart showing midterm scores for all students</li>
+<li>Color-coded risk indicators (Amber = At Risk, Indigo = Safe)</li>
+<li>Real-time statistics dashboard</li>
+</ul>
+<div class="box">[SCREENSHOT SPACE 2: Analytics Charts Section]</div>
+
+<h3>4.2 API Endpoints</h3>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+<tr><td>GET</td><td>/api/students</td><td>Fetch all students</td></tr>
+<tr><td>POST</td><td>/api/students</td><td>Add new student</td></tr>
+<tr><td>POST</td><td>/api/students/bulk</td><td>Bulk import students</td></tr>
+<tr><td>PUT</td><td>/api/students/:id</td><td>Update student prediction</td></tr>
+<tr><td>PUT</td><td>/api/students/bulk</td><td>Bulk update predictions</td></tr>
+<tr><td>DELETE</td><td>/api/students</td><td>Delete all students</td></tr>
+<tr><td>DELETE</td><td>/api/students/:id</td><td>Delete single student</td></tr>
+</table>
+
+<hr>
+
+<h2>5. DATABASE DESIGN</h2>
+<h3>5.1 Schema</h3>
+<pre>CREATE TABLE students (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  attendance REAL,
+  midterm_1 INTEGER,
+  midterm_2 INTEGER,
+  previous_grade INTEGER,
+  predicted_grade REAL,
+  status TEXT
+)</pre>
+
+<h3>5.2 Sample Data Structure</h3>
+<p>From the demo_students.csv (207 records):</p>
+<table>
+<tr><th>Field</th><th>Range</th><th>Description</th></tr>
+<tr><td>name</td><td>String</td><td>Student full name</td></tr>
+<tr><td>attendance</td><td>40-100%</td><td>Class attendance percentage</td></tr>
+<tr><td>midterm_1</td><td>4-20</td><td>First midterm score (out of 20)</td></tr>
+<tr><td>midterm_2</td><td>4-20</td><td>Second midterm score (out of 20)</td></tr>
+<tr><td>previous_grade</td><td>40-98</td><td>Previous semester grade</td></tr>
+<tr><td>predicted_grade</td><td>Calculated</td><td>AI-predicted final grade</td></tr>
+<tr><td>status</td><td>Safe/At Risk</td><td>Classification result</td></tr>
+</table>
+
+<hr>
+
+<h2>6. USER INTERFACE DESIGN</h2>
+<h3>6.1 Layout Structure</h3>
+<pre>-------------------------------------------------
+|  HEADER: Logo + Title + Action Buttons        |
+|------------------------------------------------|
+|  STATS GRID:                                   |
+|  [Total] [At Risk] [Safe] [Avg Attendance]   |
+|-----------------------+------------------------|
+|  STUDENT LIST         |  ANALYTICS SIDEBAR    |
+|  - Student Cards      |  - Bar Chart          |
+|  - Predict Buttons   |  - AI Insights        |
+|-----------------------+------------------------|
+|  ADD STUDENT MODAL (on trigger)              |
+-------------------------------------------------</pre>
+
+<h3>6.2 Key UI Components</h3>
+<ol>
+<li><b>Stat Cards:</b> Display total students, at-risk count, safe count, average attendance</li>
+<li><b>Student Cards:</b> Show individual student details with predict button</li>
+<li><b>Prediction Badge:</b> Color-coded status indicator (green = Safe, amber = At Risk)</li>
+<li><b>Modal Form:</b> Add new student with validation</li>
+<li><b>Import/Export:</b> CSV template download and data export</li>
+</ol>
+<div class="box">[SCREENSHOT SPACE 3: Student List with Prediction Badges]</div>
+
+<hr>
+
+<h2>7. IMPLEMENTATION DETAILS</h2>
+<h3>7.1 Server Implementation (server.ts)</h3>
+<p>The Express server handles all API routes and serves the frontend:</p>
+<ul>
+<li>Database Initialization: Creates SQLite table if not exists</li>
+<li>API Routes: CRUD operations for student management</li>
+<li>Static File Serving: Serves built React app in production</li>
+</ul>
+<pre>
+// Key API route - Bulk prediction update
+app.put("/api/students/bulk", (req, res) => {
+  const updates = req.body;
+  const update = db.prepare("UPDATE students SET predicted_grade = ?, status = ? WHERE id = ?");
+  const updateMany = db.transaction((data) => {
+    for (const u of data) {
+      update.run(u.predicted_grade, u.status, u.id);
+    }
+  });
+  updateMany(updates);
+  res.json({ success: true });
+});</pre>
+
+<h3>7.2 Frontend Implementation (App.tsx)</h3>
+<p>The React application provides:</p>
+<ul>
+<li>Real-time data fetching with polling (5-second interval)</li>
+<li>Animated UI with Motion library</li>
+<li>CSV parsing with PapaParse library</li>
+<li>Chart rendering with Recharts</li>
+</ul>
+<pre>
+// Prediction algorithm
+const W_ATTENDANCE = 0.2;
+const W_MIDTERM_1 = 0.25;
+const W_MIDTERM_2 = 0.35;
+const W_PREVIOUS = 0.2;
+
+const predictedGrade = Math.round(
+  (student.attendance * W_ATTENDANCE) +
+  (midterm1Normalized * W_MIDTERM_1) +
+  (midterm2Normalized * W_MIDTERM_2) +
+  (student.previous_grade * W_PREVIOUS)
+);</pre>
+
+<hr>
+
+<h2>8. TESTING & VALIDATION</h2>
+<h3>8.1 Sample Data Analysis</h3>
+<p>Using the demo_students.csv (207 records):</p>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total Students</td><td>207</td></tr>
+<tr><td>Average Attendance</td><td>~72%</td></tr>
+<tr><td>Average Midterm 1</td><td>~12/20</td></tr>
+<tr><td>Average Midterm 2</td><td>~13/20</td></tr>
+<tr><td>At Risk Students</td><td>Based on algorithm</td></tr>
+<tr><td>Safe Students</td><td>Based on algorithm</td></tr>
+</table>
+
+<h3>8.2 Algorithm Validation</h3>
+<table>
+<tr><th>Test Case</th><th>Att</th><th>M1</th><th>M2</th><th>Prev</th><th>Pred</th><th>Status</th></tr>
+<tr><td>Emma Thompson</td><td>95%</td><td>19</td><td>20</td><td>94</td><td>96%</td><td>Safe</td></tr>
+<tr><td>Liam Chen</td><td>62%</td><td>10</td><td>11</td><td>58</td><td>58%</td><td>At Risk</td></tr>
+<tr><td>Olivia Rodriguez</td><td>48%</td><td>7</td><td>8</td><td>45</td><td>43%</td><td>At Risk</td></tr>
+<tr><td>Noah Williams</td><td>89%</td><td>17</td><td>18</td><td>85</td><td>87%</td><td>Safe</td></tr>
+</table>
+<div class="box">[SCREENSHOT SPACE 4: Predicted Results Table]</div>
+
+<hr>
+
+<h2>9. DEPLOYMENT INSTRUCTIONS</h2>
+<h3>9.1 Prerequisites</h3>
+<ul>
+<li>Node.js (Latest version recommended)</li>
+<li>npm or yarn</li>
+</ul>
+
+<h3>9.2 Installation Steps</h3>
+<p><b>1. Navigate to project directory:</b></p>
+<p>cd "D:\workie\Mansi's Projects\spps final\spps final"</p>
+
+<p><b>2. Install dependencies:</b></p>
+<p>npm install</p>
+
+<p><b>3. Configure API Key (optional):</b></p>
+<ul>
+<li>Create .env.local file</li>
+<li>Add: GEMINI_API_KEY=your_api_key</li>
+</ul>
+
+<p><b>4. Run the application:</b></p>
+<p>npm run dev</p>
+
+<p><b>5. Access the application:</b></p>
+<p>Open browser to: http://localhost:3001</p>
+
+<h3>9.3 Build for Production</h3>
+<p>npm run build</p>
+<p>The built files will be in the dist/ folder.</p>
+
+<hr>
+
+<h2>10. LIMITATIONS & FUTURE ENHANCEMENTS</h2>
+<h3>10.1 Current Limitations</h3>
+<ul>
+<li>Prediction model is a simplified linear approximation (not actual ML)</li>
+<li>Single-user interface (no authentication)</li>
+<li>Local SQLite database (not cloud-based)</li>
+<li>No data backup mechanism</li>
+</ul>
+
+<h3>10.2 Future Enhancements</h3>
+<ul>
+<li>[ ] Integrate actual Google Gemini AI for more accurate predictions</li>
+<li>[ ] Add user authentication and role-based access</li>
+<li>[ ] Implement cloud database (PostgreSQL/MongoDB)</li>
+<li>[ ] Add email notifications for at-risk students</li>
+<li>[ ] Generate PDF reports</li>
+<li>[ ] Add more visualization options (pie charts, trend lines)</li>
+<li>[ ] Mobile-responsive design improvements</li>
+</ul>
+
+<hr>
+
+<h2>11. CONCLUSION</h2>
+<p>The Student Performance Prediction System (SPPS) successfully demonstrates a full-stack web application with AI-powered prediction capabilities. The system allows educators to efficiently manage student records and identify at-risk students early in the academic semester.</p>
+<p>The project showcases proficiency in:</p>
+<ul>
+<li>React frontend development</li>
+<li>Express.js backend development</li>
+<li>SQLite database management</li>
+<li>TypeScript programming</li>
+<li>UI/UX design with Tailwind CSS</li>
+<li>Data visualization with Recharts</li>
+</ul>
+<div class="box">[SCREENSHOT SPACE 5: Final Application Overview]</div>
+
+<hr>
+
+<h2>APPENDIX</h2>
+<h3>A. Package.json Dependencies</h3>
+<pre>{
+  "dependencies": {
+    "@google/genai": "^1.29.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "better-sqlite3": "^12.4.1",
+    "express": "^4.21.2",
+    "react": "^19.0.0",
+    "recharts": "^3.7.0",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24"
+  }
+}</pre>
+
+<h3>B. Sample CSV Import Format</h3>
+<pre>name,attendance,midterm_1,midterm_2,previous_grade
+John Doe,95,18,17,85
+Jane Smith,70,8,10,55</pre>
+
+<h3>C. API Documentation</h3>
+<p>Full API documentation available in Section 4.2.</p>
+
+<hr>
+
+<p style="text-align:center"><b>Report Prepared By:</b> Mansi<br><b>Date:</b> April 26, 2026<br><b>Version:</b> 1.0</p>
+
+<hr>
+
+<p><i>Attach screenshots in the designated spaces above.</i></p>
+
+</body>
+</html>

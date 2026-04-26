@@ -1,0 +1,5 @@
+{
+  "name": "Student Performance Predictor",
+  "description": "A dynamic system for tracking student data and predicting performance using AI-driven analysis.",
+  "requestFramePermissions": []
+}

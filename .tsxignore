@@ -1,0 +1,7 @@
+node_modules
+dist
+students.db
+*.lock
+*.json
+.git
+.DS_Store
