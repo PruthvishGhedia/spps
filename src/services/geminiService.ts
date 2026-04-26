@@ -49,6 +49,9 @@ export async function predictPerformance(student: Student) {
   } else if (midterm2Normalized < midterm1Normalized - 15) {
     status = "At Risk";
     reasoning = "Significant drop in performance between Midterm 1 and Midterm 2.";
+  } else if (predictedGrade >= 60 && predictedGrade < 75) {
+    status = "Idle";
+    reasoning = "Performance is borderline, may need closer monitoring.";
   }
 
   return {

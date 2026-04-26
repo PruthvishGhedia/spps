@@ -11,14 +11,14 @@ import {
   AlertTriangle,
   CheckCircle2,
   Trash2,
-  BrainCircuit,
   BarChart3,
   Loader2,
   Plus,
   FileUp,
   FileDown,
   Download,
-  Key
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 import {
   BarChart,
@@ -293,6 +293,7 @@ export default function App() {
     total: students.length,
     atRisk: students.filter(s => s.status === 'At Risk').length,
     safe: students.filter(s => s.status === 'Safe').length,
+    idle: students.filter(s => s.status === 'Idle').length,
     avgAttendance: students.length ? (students.reduce((acc, s) => acc + s.attendance, 0) / students.length).toFixed(1) : 0
   };
 
@@ -303,20 +304,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 p-2 rounded-lg">
-              <TrendingUp className="text-white w-5 h-5" />
+              <GraduationCap className="text-white w-5 h-5" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800">EduPredict AI</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-800">EduPredict</h1>
           </div>
           <div className="flex items-center gap-2">
-            {!hasApiKey && (
-              <button
-                onClick={handleOpenKeySelector}
-                className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg text-sm font-bold hover:bg-amber-200 transition-colors mr-2"
-              >
-                <Key className="w-4 h-4" />
-                Set API Key
-              </button>
-            )}
             <div className="hidden md:flex items-center gap-2 mr-4">
               <button
                 onClick={downloadTemplate}
@@ -352,7 +344,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
             title="Total Students"
             value={stats.total}
@@ -372,7 +364,13 @@ export default function App() {
             color="emerald"
           />
           <StatCard
-            title="Avg. Attendance"
+            title="Idle"
+            value={stats.idle}
+            icon={<Sparkles className="w-5 h-5 text-sky-600" />}
+            color="blue"
+          />
+          <StatCard
+            title="Avg Attendance"
             value={`${stats.avgAttendance}%`}
             icon={<BarChart3 className="w-5 h-5 text-blue-600" />}
             color="blue"
@@ -397,7 +395,7 @@ export default function App() {
                     {isPredictingAll ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <BrainCircuit className="w-3.5 h-3.5" />
+                      <Sparkles className="w-3.5 h-3.5" />
                     )}
                     Predict All
                   </button>
@@ -450,9 +448,11 @@ export default function App() {
                         {student.predicted_grade ? (
                           <div className={cn(
                             "px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5",
-                            student.status === 'Safe' ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                            student.status === 'Safe' ? "bg-emerald-50 text-emerald-700" : 
+                            student.status === 'Idle' ? "bg-blue-50 text-blue-700" : "bg-amber-50 text-amber-700"
                           )}>
-                            {student.status === 'Safe' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                            {student.status === 'Safe' ? <CheckCircle2 className="w-3.5 h-3.5" /> : 
+                             student.status === 'Idle' ? <Loader2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
                             {student.status} ({student.predicted_grade}%)
                           </div>
                         ) : (
@@ -464,7 +464,7 @@ export default function App() {
                             {predictingId === student.id ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
-                              <BrainCircuit className="w-3.5 h-3.5" />
+<Sparkles className="w-3.5 h-3.5" />
                             )}
                             Predict
                           </button>
@@ -520,16 +520,16 @@ export default function App() {
 
             <div className="bg-indigo-900 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
               <div className="relative z-10">
-                <h3 className="text-lg font-bold mb-2">AI Insights</h3>
+                <h3 className="text-lg font-bold mb-2">EduPredict Insights</h3>
                 <p className="text-indigo-100 text-sm leading-relaxed">
                   Our system uses Linear Regression to predict final grades and Decision Trees to identify students who may need early intervention.
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-xs font-medium text-indigo-200">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  System Active & Learning
+                  System Active
                 </div>
               </div>
-              <BrainCircuit className="absolute -right-4 -bottom-4 w-24 h-24 text-indigo-800 opacity-50" />
+              <Sparkles className="absolute -right-4 -bottom-4 w-24 h-24 text-indigo-800 opacity-50" />
             </div>
           </div>
         </div>
@@ -651,6 +651,10 @@ function StatCard({ title, value, icon, color }: { title: string, value: string 
     emerald: "bg-emerald-50 border-emerald-100",
     blue: "bg-blue-50 border-blue-100"
   };
+
+  if (color === "blue" && title === "Idle") {
+    colors.blue = "bg-sky-50 border-sky-100";
+  }
 
   return (
     <div className={cn("p-5 rounded-2xl border shadow-sm flex items-center justify-between", colors[color])}>
