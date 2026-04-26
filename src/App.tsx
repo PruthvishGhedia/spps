@@ -35,7 +35,7 @@ import {
 } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 import Papa from 'papaparse';
-import { Student, predictPerformance } from './services/geminiService';
+import { Student, predictPerformance } from './services/predictService';
 import { cn } from './lib/utils';
 
 export default function App() {
