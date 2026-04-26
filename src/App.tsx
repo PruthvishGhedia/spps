@@ -277,7 +277,6 @@ export default function App() {
     total: students.length,
     atRisk: students.filter(s => s.status === 'At Risk').length,
     safe: students.filter(s => s.status === 'Safe').length,
-    idle: students.filter(s => s.status === 'Idle').length,
     avgAttendance: students.length ? (students.reduce((acc, s) => acc + s.attendance, 0) / students.length).toFixed(1) : 0
   };
 
@@ -348,13 +347,7 @@ export default function App() {
             color="emerald"
           />
           <StatCard
-            title="Idle"
-            value={stats.idle}
-            icon={<Sparkles className="w-5 h-5 text-sky-600" />}
-            color="blue"
-          />
-          <StatCard
-            title="Avg Attendance"
+            title="Avg. Attendance"
             value={`${stats.avgAttendance}%`}
             icon={<BarChart3 className="w-5 h-5 text-blue-600" />}
             color="blue"
@@ -432,11 +425,9 @@ export default function App() {
                         {student.predicted_grade ? (
                           <div className={cn(
                             "px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5",
-                            student.status === 'Safe' ? "bg-emerald-50 text-emerald-700" : 
-                            student.status === 'Idle' ? "bg-blue-50 text-blue-700" : "bg-amber-50 text-amber-700"
+                            student.status === 'Safe' ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
                           )}>
-                            {student.status === 'Safe' ? <CheckCircle2 className="w-3.5 h-3.5" /> : 
-                             student.status === 'Idle' ? <Loader2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                            {student.status === 'Safe' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
                             {student.status} ({student.predicted_grade}%)
                           </div>
                         ) : (

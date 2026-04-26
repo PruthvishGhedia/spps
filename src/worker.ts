@@ -19,6 +19,21 @@ app.get('/*', serveStatic({ root: './_public' }));
 app.get('/api/students', async (c) => {
   const db = c.env.DB;
   try {
+    // Create table if not exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS students (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        attendance REAL,
+        midterm_1 INTEGER,
+        midterm_2 INTEGER,
+        previous_grade INTEGER,
+        final_grade INTEGER,
+        predicted_grade REAL,
+        status TEXT
+      )
+    `).run();
+    
     const students = await db.prepare('SELECT * FROM students ORDER BY id DESC').all();
     return c.json(students.results || []);
   } catch (e) {
@@ -30,16 +45,22 @@ app.get('/api/students', async (c) => {
 // POST single student
 app.post('/api/students', async (c) => {
   const db = c.env.DB;
-  const { name, attendance, midterm_1, midterm_2, previous_grade } = await c.req.json();
   
   try {
+    const { name, attendance, midterm_1, midterm_2, previous_grade } = await c.req.json();
+    
+    if (!name) {
+      return c.json({ error: 'Name is required' }, 400);
+    }
+    
     const result = await db.prepare(`
       INSERT INTO students (name, attendance, midterm_1, midterm_2, previous_grade)
       VALUES (?, ?, ?, ?, ?)
-    `).bind(name, attendance, midterm_1, midterm_2, previous_grade).run();
+    `).bind(name, attendance || 0, midterm_1 || 0, midterm_2 || 0, previous_grade || 0).run();
     
     return c.json({ id: result.meta?.last_row_id });
   } catch (e) {
+    console.error('Insert error:', e);
     return c.json({ error: String(e) }, 500);
   }
 });
@@ -47,13 +68,14 @@ app.post('/api/students', async (c) => {
 // POST - Bulk insert
 app.post('/api/students/bulk', async (c) => {
   const db = c.env.DB;
-  const students = await c.req.json();
-  
-  if (!Array.isArray(students)) {
-    return c.json({ error: 'Expected array' }, 400);
-  }
   
   try {
+    const students = await c.req.json();
+    
+    if (!Array.isArray(students)) {
+      return c.json({ error: 'Expected array' }, 400);
+    }
+    
     for (const s of students) {
       await db.prepare(`
         INSERT INTO students (name, attendance, midterm_1, midterm_2, previous_grade)
@@ -63,7 +85,8 @@ app.post('/api/students/bulk', async (c) => {
     
     return c.json({ success: true, count: students.length });
   } catch (e) {
-    return c.json({ error: String(e) }, 500);
+    console.error('Bulk insert error:', e);
+    return c.json({ error: 'Failed to import: ' + String(e) }, 500);
   }
 });
 
