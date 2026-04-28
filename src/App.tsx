@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Users,
   UserPlus,
@@ -53,26 +53,48 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [isPredictingAll, setIsPredictingAll] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(true);
+  const [useLocalStorage, setUseLocalStorage] = useState(false);
+  let studentIdCounter = useRef(1);
 
-  useEffect(() => {
-    fetchStudents();
-    // Set up polling interval for real-time updates
-    const interval = setInterval(fetchStudents, 5000); // Fetch every 5 seconds
+  const STORAGE_KEY = 'edupredict_students';
 
-    return () => clearInterval(interval);
-  }, []);
+  const saveToStorage = (data: Student[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) { console.error('Storage save error:', e); }
+  };
+
+  const loadFromStorage = (): Student[] => {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) { console.error('Storage load error:', e); return []; }
+  };
+
+  const apiUrl = '/api';
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch('/api/students');
+      const res = await fetch(`${apiUrl}/students`);
+      if (!res.ok) throw new Error('API not available');
       const data = await res.json();
       setStudents(data);
+      setUseLocalStorage(false);
     } catch (error) {
-      console.error('Failed to fetch students:', error);
+      console.log('API unavailable, using localStorage');
+      setUseLocalStorage(true);
+      const stored = loadFromStorage();
+      setStudents(stored);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStudents();
+    const interval = setInterval(fetchStudents, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,16 +116,23 @@ export default function App() {
         }));
 
         try {
-          const res = await fetch('/api/students/bulk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(studentsToImport)
-          });
-
-          if (!res.ok) throw new Error('Bulk import failed');
-
-          alert(`Successfully imported ${studentsToImport.length} students.`);
-          fetchStudents();
+          if (useLocalStorage) {
+            const existing = loadFromStorage();
+            const maxId = Math.max(0, ...existing.map(s => s.id || 0));
+            const newStudents = studentsToImport.map((s, i) => ({ ...s, id: maxId + i + 1 }));
+            saveToStorage([...existing, ...newStudents]);
+            setStudents([...existing, ...newStudents]);
+            alert(`Successfully imported ${studentsToImport.length} students.`);
+          } else {
+            const res = await fetch('/api/students/bulk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(studentsToImport)
+            });
+            if (!res.ok) throw new Error('Bulk import failed');
+            alert(`Successfully imported ${studentsToImport.length} students.`);
+            fetchStudents();
+          }
         } catch (err) {
           console.error('Failed to import students:', err);
           alert('Failed to import data. Please check the file format.');
@@ -148,14 +177,14 @@ export default function App() {
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newStudent)
-      });
-      if (res.ok) {
+      if (useLocalStorage) {
+        const existing = loadFromStorage();
+        const maxId = Math.max(0, ...existing.map(s => s.id || 0));
+        const newStudentWithId = { ...newStudent, id: maxId + 1 } as Student;
+        const updated = [...existing, newStudentWithId];
+        saveToStorage(updated);
+        setStudents(updated);
         setShowAddModal(false);
-        fetchStudents();
         setNewStudent({
           name: '',
           attendance: 85,
@@ -163,6 +192,23 @@ export default function App() {
           midterm_2: 14,
           previous_grade: 75
         });
+      } else {
+        const res = await fetch('/api/students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newStudent)
+        });
+        if (res.ok) {
+          setShowAddModal(false);
+          fetchStudents();
+          setNewStudent({
+            name: '',
+            attendance: 85,
+            midterm_1: 15,
+            midterm_2: 14,
+            previous_grade: 75
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to add student:', error);
@@ -174,15 +220,22 @@ export default function App() {
     setPredictingId(student.id);
     try {
       const prediction = await predictPerformance(student);
-      await fetch(`/api/students/${student.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          predicted_grade: prediction.predicted_grade,
-          status: prediction.status
-        })
-      });
-      fetchStudents();
+      if (useLocalStorage) {
+        const existing = loadFromStorage();
+        const updated = existing.map(s => s.id === student.id ? { ...s, predicted_grade: prediction.predicted_grade, status: prediction.status } : s);
+        saveToStorage(updated);
+        setStudents(updated);
+      } else {
+        await fetch(`/api/students/${student.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            predicted_grade: prediction.predicted_grade,
+            status: prediction.status
+          })
+        });
+        fetchStudents();
+      }
     } catch (error) {
       console.error('Prediction failed:', error);
     } finally {
@@ -219,17 +272,24 @@ export default function App() {
         results.push(...batchResults);
       }
 
-      console.log('Sending bulk updates to server:', results.length);
-      const res = await fetch('/api/students/bulk', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(results)
-      });
-
-      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-      console.log('Bulk updates successful. Refreshing list...');
-      await fetchStudents();
+      console.log('Sending bulk updates:', results.length);
+      if (useLocalStorage) {
+        const existing = loadFromStorage();
+        const updated = existing.map(s => {
+          const result = results.find(r => r.id === s.id);
+          return result ? { ...s, predicted_grade: result.predicted_grade, status: result.status } : s;
+        });
+        saveToStorage(updated);
+        setStudents(updated);
+      } else {
+        const res = await fetch('/api/students/bulk', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(results)
+        });
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        await fetchStudents();
+      }
       alert(`Successfully predicted performance for ${results.length} students.`);
     } catch (error) {
       console.error('Predict all failed:', error);
@@ -242,8 +302,15 @@ export default function App() {
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this student?')) return;
     try {
-      await fetch(`/api/students/${id}`, { method: 'DELETE' });
-      fetchStudents();
+      if (useLocalStorage) {
+        const existing = loadFromStorage();
+        const updated = existing.filter(s => s.id !== id);
+        saveToStorage(updated);
+        setStudents(updated);
+      } else {
+        await fetch(`/api/students/${id}`, { method: 'DELETE' });
+        fetchStudents();
+      }
     } catch (error) {
       console.error('Delete failed:', error);
     }
@@ -256,15 +323,16 @@ export default function App() {
     try {
       console.log('Attempting to clear all students...');
       setLoading(true);
-      const res = await fetch('/api/students', { method: 'DELETE' });
-
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      if (useLocalStorage) {
+        localStorage.removeItem(STORAGE_KEY);
+        setStudents([]);
+      } else {
+        const res = await fetch('/api/students', { method: 'DELETE' });
+        if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
+        setStudents([]);
       }
-
-      setStudents([]);
       alert('All student data has been removed.');
-      console.log('All student data successfully removed from database and UI.');
+      console.log('All student data successfully removed.');
     } catch (error) {
       console.error('Failed to delete all students:', error);
       alert('Failed to clear data. Please check the console for details.');
